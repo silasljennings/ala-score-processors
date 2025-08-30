@@ -3,7 +3,6 @@ steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA', '.']
-    dir: 'server'
 
   # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
