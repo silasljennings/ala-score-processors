@@ -1,0 +1,36 @@
+steps:
+
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA', '.']
+    dir: 'server'
+
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA']
+
+  # Step 3: Deploy to Cloud Run with environment variables
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        SUPABASE_URL=$$(gcloud secrets versions access latest --secret=SUPABASE_URL_DEV_DEVIANTS)
+        SUPABASE_SERVICE_ROLE_KEY=$$(gcloud secrets versions access latest --secret=SUPABASE_SERVICE_ROLE_KEY_DEV_DEVIANTS)
+        
+        echo "Deploying server with environment variables from Secret Manager"
+        
+        gcloud run deploy "$REPO_NAME" \
+          --image "us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA" \
+          --region us-central1 \
+          --port=8080 \
+          --allow-unauthenticated \
+          --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}",SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}"
+
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
