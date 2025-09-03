@@ -76,7 +76,7 @@ steps:
             --uri="$$URI" \
             --http-method="PUT" \
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
-            --headers="$$HEADERS" \
+            --update-headers="$$HEADERS" \
             --message-body="$$BODY"
         done
 
