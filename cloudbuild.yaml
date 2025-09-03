@@ -16,8 +16,9 @@ steps:
       - |
         SUPABASE_URL=$$(gcloud secrets versions access latest --secret=SUPABASE_URL_DEV_DEVIANTS)
         SUPABASE_SERVICE_ROLE_KEY=$$(gcloud secrets versions access latest --secret=SUPABASE_SERVICE_ROLE_KEY_DEV_DEVIANTS)
+        ALA_SCORE_PROCESSOR_SECRET=$$(gcloud secrets versions access latest --secret=ALA_SCORE_PROCESSOR_SECRET)
         
-        echo "Deploying server with environment variables from Secret Manager"
+        echo "Deploying server to Cloud Run"
         
         gcloud run deploy "$REPO_NAME" \
           --image "us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA" \
@@ -28,7 +29,12 @@ steps:
           --cpu-boost \
           --execution-environment=gen2 \
           --min-instances=1 \
-          --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}",SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}",ENABLE_SCHEDULER=true,USE_TIMEZONE_SCHEDULES=true,SPORT_SCHEDULES=seasonal
+          --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}"
+          --set-env-vars=SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}"
+          --set-env-vars=ALA_SCORE_PROCESSOR_SECRET="$${ALA_SCORE_PROCESSOR_SECRET}"
+          --set-env-vars=ENABLE_SCHEDULER=true
+          --set-env-var=USE_TIMEZONE_SCHEDULES=true
+          --set-env-vars=SPORT_SCHEDULES=seasonal
 
     # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'

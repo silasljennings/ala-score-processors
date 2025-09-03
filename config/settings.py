@@ -46,3 +46,9 @@ def get_scrape_retries() -> int:
 def get_default_sport() -> str:
     """Get default sport to scrape, defaults to football"""
     return os.environ.get("SPORT") or "football"
+
+
+# Get authentication secret for API security
+def get_ala_score_processor_secret() -> str:
+    """Get ALA score processor secret for X_ALA_KEY header authentication"""
+    return os.environ.get("ALA_SCORE_PROCESSOR_SECRET")

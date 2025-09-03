@@ -1,6 +1,6 @@
 from api.routes import scrape_handler, finalize_handler
 from fastapi import Request
-from config.settings import get_states_list, get_default_sport
+from config.settings import get_states_list, get_default_sport, get_ala_score_processor_secret
 
 
 # Wrapper class to simulate FastAPI Request for scheduled tasks
@@ -8,6 +8,8 @@ class MockRequest:
     def __init__(self, body_data: dict = None):
         self.body_data = body_data or {}
         self.query_params = {}
+        # Add authentication header for scheduled tasks
+        self.headers = {"X_ALA_KEY": get_ala_score_processor_secret() or ""}
     
     async def json(self):
         return self.body_data

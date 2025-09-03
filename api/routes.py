@@ -1,8 +1,8 @@
 import os
 import asyncio
-from fastapi import Request
+from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
-from config.settings import get_states_list, get_scrape_concurrency, get_batch_pause_ms, get_default_sport
+from config.settings import get_states_list, get_scrape_concurrency, get_batch_pause_ms, get_default_sport, get_ala_score_processor_secret
 from utils.time_helpers import within_run_window_ny, today_mdy_ny
 from utils.data_helpers import to_mdy
 from utils.url_helpers import build_scores_url
@@ -12,9 +12,27 @@ from database.supabase_client import dedupe_by_contest_id, chunked_upsert
 from finalize.score_finalizer import finalize_scores
 
 
+# Authentication helper function
+def validate_api_key(request: Request):
+    """Validate X_ALA_KEY header matches ALA_SCORE_PROCESSOR_SECRET"""
+    expected_key = get_ala_score_processor_secret()
+    if not expected_key:
+        raise HTTPException(status_code=500, detail="Authentication secret not configured")
+    
+    provided_key = request.headers.get("X_ALA_KEY")
+    if not provided_key:
+        raise HTTPException(status_code=401, detail="X_ALA_KEY header required")
+    
+    if provided_key != expected_key:
+        raise HTTPException(status_code=403, detail="Invalid X_ALA_KEY")
+
+
 # Main scraping endpoint handler
 async def scrape_handler(request: Request) -> JSONResponse:
     """Handle POST /scrape requests to scrape sports scores from MaxPreps"""
+    # Validate authentication
+    validate_api_key(request)
+    
     req_id = os.urandom(4).hex()
     
     try:
@@ -103,6 +121,9 @@ async def scrape_handler(request: Request) -> JSONResponse:
 # Score finalization endpoint handler
 async def finalize_handler(request: Request) -> JSONResponse:
     """Handle POST /finalize requests to finalize scraped scores"""
+    # Validate authentication
+    validate_api_key(request)
+    
     req_id = os.urandom(4).hex()
     print(f"[{req_id}] Incoming finalize request")
     

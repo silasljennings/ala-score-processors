@@ -117,6 +117,7 @@ Covers all US states across 6 timezones with proper local time handling:
 ```bash
 SUPABASE_URL=your-supabase-url                    # Database URL
 SUPABASE_SERVICE_ROLE_KEY=your-service-key        # Database auth key
+ALA_SCORE_PROCESSOR_SECRET=your-secret-key        # API authentication secret
 ```
 
 #### Scheduling (Optional)
@@ -143,8 +144,8 @@ SCRAPE_RETRIES=2                                  # Retry failed requests
 ## 📡 API Endpoints
 
 ### Core Operations
-- `POST /scrape` - Manual score scraping
-- `POST /finalize` - Manual score finalization
+- `POST /scrape` - Manual score scraping (requires X_ALA_KEY header)
+- `POST /finalize` - Manual score finalization (requires X_ALA_KEY header)
 - `GET /health` - Health check with scheduler status
 - `GET /season` - Current season information
 
@@ -300,7 +301,10 @@ python -c "import ast; [ast.parse(open(f).read()) for f in ['main.py', 'cli.py']
 python -c "from main import app; print('✓ Main app import successful')"
 
 # Manual test endpoints
-curl -X POST http://localhost:8080/scrape -H "Content-Type: application/json" -d '{"states":"al","sport":"football","force":true}'
+curl -X POST http://localhost:8080/scrape \
+  -H "Content-Type: application/json" \
+  -H "X_ALA_KEY: your-secret-key" \
+  -d '{"states":"al","sport":"football","force":true}'
 ```
 
 ### Adding New Sports
@@ -321,7 +325,8 @@ curl -X POST http://localhost:8080/scrape -H "Content-Type: application/json" -d
 
 ## 🔒 Security
 
-- Environment variables for sensitive data (database credentials)
+- Environment variables for sensitive data (database credentials, API secrets)
+- API key authentication via X_ALA_KEY header for all scraping/finalization endpoints
 - Service role authentication for Supabase
 - Rate limiting and polite scraping practices
 - Input validation and error handling
