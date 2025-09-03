@@ -170,3 +170,5 @@ coverage.xml
 
 # Cloud Build artifacts
 cloudbuild-local/
+
+curls/
