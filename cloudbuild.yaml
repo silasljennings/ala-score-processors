@@ -29,14 +29,15 @@ steps:
           --cpu-boost \
           --execution-environment=gen2 \
           --min-instances=1 \
-          --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}"
-          --set-env-vars=SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}"
-          --set-env-vars=ALA_SCORE_PROCESSOR_SECRET="$${ALA_SCORE_PROCESSOR_SECRET}"
-          --set-env-vars=ENABLE_SCHEDULER=true
-          --set-env-var=USE_TIMEZONE_SCHEDULES=true
+          --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}" \
+          --set-env-vars=SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}" \
+          --set-env-vars=ALA_SCORE_PROCESSOR_SECRET="$${ALA_SCORE_PROCESSOR_SECRET}" \
+          --set-env-vars=ENABLE_SCHEDULER=true \
+          --set-env-vars=USE_TIMEZONE_SCHEDULES=true \
           --set-env-vars=SPORT_SCHEDULES=seasonal
+  
 
-    # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
+  # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: bash
     args:
