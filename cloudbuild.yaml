@@ -30,64 +30,52 @@ steps:
           --min-instances=1 \
           --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}",SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}",ENABLE_SCHEDULER=true,USE_TIMEZONE_SCHEDULES=true,SPORT_SCHEDULES=seasonal
 
-  # Step 4: Create or update Cloud Scheduler jobs for scale-up/down
+  # Step 4: Ensure Cloud Scheduler jobs exist (scale-up / scale-down)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: bash
     args:
       - -c
       - |
-        SERVICE_NAME="$REPO_NAME"
-        REGION="us-central1"
-        PROJECT="$PROJECT_ID"
-        SCHEDULER_SA="cloud-scheduler@$PROJECT.iam.gserviceaccount.com"
+        SERVICE_ACCOUNT="$PROJECT_NUMBER-compute@developer.gserviceaccount.com"
 
-        declare -A jobs
-        jobs[eastern_up]="0 20 * * *"
-        jobs[eastern_down]="0 6 * * *"
-        jobs[central_up]="0 21 * * *"
-        jobs[central_down]="0 7 * * *"
-        jobs[mountain_up]="0 22 * * *"
-        jobs[mountain_down]="0 8 * * *"
-        jobs[pacific_up]="0 23 * * *"
-        jobs[pacific_down]="0 9 * * *"
-        jobs[alaska_up]="0 0 * * *"
-        jobs[alaska_down]="0 10 * * *"
-        jobs[hawaii_up]="0 1 * * *"
-        jobs[hawaii_down]="0 11 * * *"
+        echo "Creating or updating Cloud Scheduler jobs..."
 
-        for zone in eastern central mountain pacific alaska hawaii; do
-          for action in up down; do
-            JOB_NAME="scale-${action}-${zone}-${SERVICE_NAME}"
-            CRON_EXPR="${jobs[${zone}_${action}]}"
+        # Scale Up (20:00 UTC = 3PM ET)
+        gcloud scheduler jobs create http scale-up-cron \
+          --schedule "0 20 * * *" \
+          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
+          --http-method PATCH \
+          --oauth-service-account-email "$SERVICE_ACCOUNT" \
+          --headers "Content-Type=application/merge-patch+json" \
+          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"1"}}}}}' \
+          --location us-central1 || \
+        gcloud scheduler jobs update http scale-up-cron \
+          --schedule "0 20 * * *" \
+          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
+          --http-method PATCH \
+          --oauth-service-account-email "$SERVICE_ACCOUNT" \
+          --headers "Content-Type=application/merge-patch+json" \
+          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"1"}}}}}' \
+          --location us-central1
 
-            BODY_UP='{"template":{"scaling":{"minInstanceCount":1}}}'
-            BODY_DOWN='{"template":{"scaling":{"minInstanceCount":0}}}'
-            BODY=$([ "$action" = "up" ] && echo "$BODY_UP" || echo "$BODY_DOWN")
+        # Scale Down (09:00 UTC = 1AM HT)
+        gcloud scheduler jobs create http scale-down-cron \
+          --schedule "0 12 * * *" \
+          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
+          --http-method PATCH \
+          --oauth-service-account-email "$SERVICE_ACCOUNT" \
+          --headers "Content-Type=application/merge-patch+json" \
+          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"0"}}}}}' \
+          --location us-central1 || \
+        gcloud scheduler jobs update http scale-down-cron \
+          --schedule "0 12 * * *" \
+          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
+          --http-method PATCH \
+          --oauth-service-account-email "$SERVICE_ACCOUNT" \
+          --headers "Content-Type=application/merge-patch+json" \
+          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"0"}}}}}' \
+          --location us-central1
 
-            # Try update first, if not exists then create
-            if gcloud scheduler jobs describe "$JOB_NAME" --location=us-central1 >/dev/null 2>&1; then
-              echo "Updating existing job: $JOB_NAME"
-              gcloud scheduler jobs update http "$JOB_NAME" \
-                --schedule="$CRON_EXPR" \
-                --time-zone="UTC" \
-                --uri="https://cloudrun.googleapis.com/v2/projects/$PROJECT/locations/$REGION/services/$SERVICE_NAME" \
-                --http-method=PATCH \
-                --oauth-service-account-email=$SCHEDULER_SA \
-                --headers="Content-Type=application/json" \
-                --message-body="$BODY"
-            else
-              echo "Creating new job: $JOB_NAME"
-              gcloud scheduler jobs create http "$JOB_NAME" \
-                --schedule="$CRON_EXPR" \
-                --time-zone="UTC" \
-                --uri="https://cloudrun.googleapis.com/v2/projects/$PROJECT/locations/$REGION/services/$SERVICE_NAME" \
-                --http-method=PATCH \
-                --oauth-service-account-email=$SCHEDULER_SA \
-                --headers="Content-Type=application/json" \
-                --message-body="$BODY"
-            fi
-          done
-        done
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA'
