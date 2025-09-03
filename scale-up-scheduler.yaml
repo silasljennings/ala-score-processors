@@ -1,0 +1,20 @@
+name: projects/prod-devdeviants/locations/us-central1/jobs/scale-up-score-processors
+schedule: 0 15 * * *
+timeZone: America/New_York
+attemptDeadline: 180s
+retryConfig:
+  maxBackoffDuration: 300s
+  maxDoublings: 5
+  maxRetryDuration: 120s
+  minBackoffDuration: 5s
+  retryCount: 3
+httpTarget:
+  uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/prod-devdeviants/services/ala-score-processors
+  httpMethod: POST
+  headers:
+    Content-Type: application/octet-stream
+    User-Agent: Google-Cloud-Scheduler
+  body:
+  oidcToken:
+    audience: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/prod-devdeviants/services/ala-score-processors
+    serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com

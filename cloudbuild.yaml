@@ -30,52 +30,15 @@ steps:
           --min-instances=1 \
           --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}",SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}",ENABLE_SCHEDULER=true,USE_TIMEZONE_SCHEDULES=true,SPORT_SCHEDULES=seasonal
 
-  # Step 4: Ensure Cloud Scheduler jobs exist (scale-up / scale-down)
+  # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: bash
     args:
       - -c
       - |
-        SERVICE_ACCOUNT="$PROJECT_NUMBER-compute@developer.gserviceaccount.com"
-
-        echo "Creating or updating Cloud Scheduler jobs..."
-
-        # Scale Up (20:00 UTC = 3PM ET)
-        gcloud scheduler jobs create http scale-up-cron \
-          --schedule "0 20 * * *" \
-          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PUT \
-          --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/json" \
-          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"1"}}}}}' \
-          --location us-central1 || \
-        gcloud scheduler jobs update http scale-up-cron \
-          --schedule "0 20 * * *" \
-          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PUT \
-          --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/json" \
-          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"1"}}}}}' \
-          --location us-central1
-
-        # Scale Down (09:00 UTC = 1AM HT)
-        gcloud scheduler jobs create http scale-down-cron \
-          --schedule "0 12 * * *" \
-          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PUT \
-          --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/json" \
-          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"0"}}}}}' \
-          --location us-central1 || \
-        gcloud scheduler jobs update http scale-down-cron \
-          --schedule "0 12 * * *" \
-          --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PUT \
-          --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/json" \
-          --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"0"}}}}}' \
-          --location us-central1
-
+        echo "Updating Cloud Scheduler jobs from YAML..."
+        gcloud scheduler jobs replace scale-up --location=us-central1 --quiet --source=scale-up-scheduler.yaml
+        gcloud scheduler jobs replace scale-down --location=us-central1 --quiet --source=scale-down-scheduler.yaml
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA'
