@@ -12,7 +12,7 @@ httpTarget:
     audience: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/prod-devdeviants/services/ala-score-processors
 
 name: projects/prod-devdeviants/locations/us-central1/jobs/scale-down-score-processor
-schedule: "0 1 * * *"
+schedule: "0 2 * * *"
 timeZone: Pacific/Honolulu
 retryConfig:
   retryCount: 3
