@@ -9,7 +9,7 @@ httpTarget:
     ewogICJzcGVjIjogewogICAgInRlbXBsYXRlIjogewogICAgICAibWV0YWRhdGEiOiB7CiAgICAgICAgImFubm90YXRpb25zIjogewogICAgICAgICAgImF1dG9zY2FsaW5nLmtuYXRpdmUuZGV2L21pblNjYWxlIjogIjAiCiAgICAgICAgfQogICAgICB9CiAgICB9CiAgfQp9Cg==
   oidcToken:
     serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
-    audience: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/prod-devdeviants/services/ala-score-processors
+    scope: https://www.googleapis.com/auth/cloud-platform
 
 name: projects/prod-devdeviants/locations/us-central1/jobs/scale-down-score-processor
 schedule: "0 2 * * *"
