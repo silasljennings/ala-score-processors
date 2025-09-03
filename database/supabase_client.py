@@ -30,13 +30,12 @@ async def chunked_upsert(req_id: str, rows: list[dict], chunk_size: int = 500) -
     
     for i in range(0, len(rows), chunk_size):
         chunk = rows[i : i + chunk_size]
-        resp = supabase.table(TABLE).upsert(chunk, on_conflict="contest_id").execute()
-        
-        if getattr(resp, "error", None):
-            print(f"[{req_id}] upsert error: {resp.error}")
+        try:
+            resp = supabase.table(TABLE).upsert(chunk, on_conflict="contest_id").execute()
+            total += len(resp.data or [])
+            print(f"[{req_id}] upsert {i}-{i+len(chunk)-1} ok={len(resp.data or [])}")
+        except Exception as e:
+            print(f"[{req_id}] upsert error: {e}")
             continue
-            
-        total += len(resp.data or [])
-        print(f"[{req_id}] upsert {i}-{i+len(chunk)-1} ok={len(resp.data or [])}")
     
     return total

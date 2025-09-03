@@ -23,23 +23,23 @@ async def finalize_scores(states: list[str], sport: str, req_id: str = None) -> 
     # Fetch rows that need finalization
     print(f"[{req_id}] Querying rows from {TABLE}...")
     
-    response = supabase.table(TABLE).select(
-        "id, state_code, sport, contest_state, team1_score, team2_score"
-    ).in_(
-        "state_code", states
-    ).eq(
-        "sport", sport.upper()
-    ).neq(
-        "contest_state", "boxscore"
-    ).neq(
-        "contest_state", "pregame" 
-    ).execute()
-    
-    if response.error:
-        print(f"[{req_id}] Fetch error: {response.error}")
-        raise Exception(f"Database fetch error: {response.error}")
-    
-    rows = response.data or []
+    try:
+        response = supabase.table(TABLE).select(
+            "id, state_code, sport, contest_state, team1_score, team2_score"
+        ).in_(
+            "state_code", states
+        ).eq(
+            "sport", sport.upper()
+        ).neq(
+            "contest_state", "boxscore"
+        ).neq(
+            "contest_state", "pregame" 
+        ).execute()
+        
+        rows = response.data or []
+    except Exception as e:
+        print(f"[{req_id}] Fetch error: {e}")
+        raise Exception(f"Database fetch error: {e}")
     print(f"[{req_id}] Rows fetched: {len(rows)}")
     
     if not rows:
@@ -85,18 +85,18 @@ async def finalize_scores(states: list[str], sport: str, req_id: str = None) -> 
     # Perform upsert if there are updates
     rows_successfully_updated = 0
     if updates:
-        update_response = supabase.table(TABLE).upsert(
-            updates, 
-            on_conflict="id",
-            ignore_duplicates=False
-        ).execute()
-        
-        if update_response.error:
-            print(f"[{req_id}] Upsert error: {update_response.error}")
-            raise Exception(f"Database update error: {update_response.error}")
-        
-        rows_successfully_updated = len(update_response.data or [])
-        print(f"[{req_id}] Upsert successful: {rows_successfully_updated} rows updated")
+        try:
+            update_response = supabase.table(TABLE).upsert(
+                updates, 
+                on_conflict="id",
+                ignore_duplicates=False
+            ).execute()
+            
+            rows_successfully_updated = len(update_response.data or [])
+            print(f"[{req_id}] Upsert successful: {rows_successfully_updated} rows updated")
+        except Exception as e:
+            print(f"[{req_id}] Upsert error: {e}")
+            raise Exception(f"Database update error: {e}")
     
     # Return response
     print(f"[{req_id}] Finalize complete. sport={sport} states={','.join(states)} rows={len(rows)} updated={rows_successfully_updated}")
