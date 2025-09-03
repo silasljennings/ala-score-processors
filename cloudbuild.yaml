@@ -30,31 +30,55 @@ steps:
           --min-instances=1 \
           --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}",SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}",ENABLE_SCHEDULER=true,USE_TIMEZONE_SCHEDULES=true,SPORT_SCHEDULES=seasonal
 
-  # Step 4: Sync Cloud Scheduler jobs from YAML
+  # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: bash
     args:
       - -c
       - |
-        echo "Applying Cloud Scheduler jobs from YAML..."
+        apt-get update && apt-get install -y wget
+        wget https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64 -O /usr/bin/yq
+        chmod +x /usr/bin/yq
+        yq --version
+        echo "Syncing Cloud Scheduler jobs from YAML..."
+
+        for FILE in scale-up-scheduler.yaml scale-down-scheduler.yaml; do
+          echo "Processing $FILE ..."
         
-        # Scale Up
-        gcloud scheduler jobs create http scale-up-score-processors \
-          --quiet \
-          --location=us-central1 \
-          --source=scale-up-scheduler.yaml || \
-        gcloud scheduler jobs update http scale-up-score-processors \
-          --location=us-central1 \
-          --source=scale-up-scheduler.yaml
+          NAME=$(basename $FILE .yaml)   # e.g. "scale-up-scheduler"
+          JOB_NAME=${NAME/-scheduler/}   # e.g. "scale-up" or "scale-down"
         
-        # Scale Down
-        gcloud scheduler jobs create http scale-down-score-processors \
-          --quiet \
-          --location=us-central1 \
-          --source=scale-down-scheduler.yaml || \
-        gcloud scheduler jobs update http scale-down-score-processors \
-          --location=us-central1 \
-          --source=scale-down-scheduler.yaml
+          SCHEDULE=$(yq -r '.schedule' $FILE)
+          TIMEZONE=$(yq -r '.timeZone' $FILE)
+          URI=$(yq -r '.httpTarget.uri' $FILE)
+          METHOD=$(yq -r '.httpTarget.httpMethod' $FILE)
+          SERVICE_ACCOUNT=$(yq -r '.httpTarget.oidcToken.serviceAccountEmail' $FILE)
+          HEADERS=$(yq -r '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' $FILE)
+          BODY=$(yq -r '.httpTarget.body' $FILE)
+
+          echo "Validating extracted values..."
+          echo "JOB=$JOB_NAME, SCHEDULE=$SCHEDULE, TIMEZONE=$TIMEZONE, URI=$URI, METHOD=$METHOD"
+
+          gcloud scheduler jobs create http "$JOB_NAME-score-processor" \
+            --location=us-central1 \
+            --quiet \
+            --schedule="$SCHEDULE" \
+            --time-zone="$TIMEZONE" \
+            --uri="$URI" \
+            --http-method="$METHOD" \
+            --oidc-service-account-email="$SERVICE_ACCOUNT" \
+            --headers="$HEADERS" \
+            --message-body="$BODY" || \
+          gcloud scheduler jobs update http "$JOB_NAME-score-processor" \
+            --location=us-central1 \
+            --schedule="$SCHEDULE" \
+            --time-zone="$TIMEZONE" \
+            --uri="$URI" \
+            --http-method="$METHOD" \
+            --oidc-service-account-email="$SERVICE_ACCOUNT" \
+            --headers="$HEADERS" \
+            --message-body="$BODY"
+        done
 
 
 images:
@@ -62,4 +86,3 @@ images:
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
