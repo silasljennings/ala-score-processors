@@ -36,9 +36,54 @@ steps:
     args:
       - -c
       - |
-        echo "Updating Cloud Scheduler jobs from YAML..."
-        gcloud scheduler jobs replace scale-up --location=us-central1 --quiet --source=scale-up-scheduler.yaml
-        gcloud scheduler jobs replace scale-down --location=us-central1 --quiet --source=scale-down-scheduler.yaml
+        echo "Syncing Cloud Scheduler jobs from YAML..."
+        
+        # Scale Up job
+        gcloud scheduler jobs create http scale-up-score-processors \
+          --location=us-central1 \
+          --quiet \
+          --description="Scale up Cloud Run service at 3PM ET" \
+          --schedule="$(yq '.schedule' scale-up-scheduler.yaml)" \
+          --time-zone="$(yq '.timeZone' scale-up-scheduler.yaml)" \
+          --uri="$(yq '.httpTarget.uri' scale-up-scheduler.yaml)" \
+          --http-method="$(yq '.httpTarget.httpMethod' scale-up-scheduler.yaml)" \
+          --oidc-service-account-email="$(yq '.httpTarget.oidcToken.serviceAccountEmail' scale-up-scheduler.yaml)" \
+          --headers="$(yq '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' scale-up-scheduler.yaml)" \
+          --message-body="$(yq '.httpTarget.body' scale-up-scheduler.yaml)" \
+          || \
+        gcloud scheduler jobs update http scale-up-score-processors \
+          --location=us-central1 \
+          --schedule="$(yq '.schedule' scale-up-scheduler.yaml)" \
+          --time-zone="$(yq '.timeZone' scale-up-scheduler.yaml)" \
+          --uri="$(yq '.httpTarget.uri' scale-up-scheduler.yaml)" \
+          --http-method="$(yq '.httpTarget.httpMethod' scale-up-scheduler.yaml)" \
+          --oidc-service-account-email="$(yq '.httpTarget.oidcToken.serviceAccountEmail' scale-up-scheduler.yaml)" \
+          --headers="$(yq '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' scale-up-scheduler.yaml)" \
+          --message-body="$(yq '.httpTarget.body' scale-up-scheduler.yaml)"
+        
+        # Scale Down job
+        gcloud scheduler jobs create http scale-down-score-processors \
+          --location=us-central1 \
+          --quiet \
+          --description="Scale down Cloud Run service at 1AM HT" \
+          --schedule="$(yq '.schedule' scale-down-scheduler.yaml)" \
+          --time-zone="$(yq '.timeZone' scale-down-scheduler.yaml)" \
+          --uri="$(yq '.httpTarget.uri' scale-down-scheduler.yaml)" \
+          --http-method="$(yq '.httpTarget.httpMethod' scale-down-scheduler.yaml)" \
+          --oidc-service-account-email="$(yq '.httpTarget.oidcToken.serviceAccountEmail' scale-down-scheduler.yaml)" \
+          --headers="$(yq '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' scale-down-scheduler.yaml)" \
+          --message-body="$(yq '.httpTarget.body' scale-down-scheduler.yaml)" \
+          || \
+        gcloud scheduler jobs update http scale-down-score-processors \
+          --location=us-central1 \
+          --schedule="$(yq '.schedule' scale-down-scheduler.yaml)" \
+          --time-zone="$(yq '.timeZone' scale-down-scheduler.yaml)" \
+          --uri="$(yq '.httpTarget.uri' scale-down-scheduler.yaml)" \
+          --http-method="$(yq '.httpTarget.httpMethod' scale-down-scheduler.yaml)" \
+          --oidc-service-account-email="$(yq '.httpTarget.oidcToken.serviceAccountEmail' scale-down-scheduler.yaml)" \
+          --headers="$(yq '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' scale-down-scheduler.yaml)" \
+          --message-body="$(yq '.httpTarget.body' scale-down-scheduler.yaml)"
+
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA'
