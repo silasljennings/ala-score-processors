@@ -1,0 +1,261 @@
+# Football Scheduling Configuration
+# This file defines the complete scheduling setup that replicates your Supabase SQL cron jobs
+
+# Timezone-aware football scraping schedules
+# Runs every 3 minutes during game hours (5PM-11:30PM local time) for Thu, Fri, Sat
+football_scraping:
+  enabled: true
+  sport: "football"
+  force_run: true  # Always force during game windows
+  
+  timezones:
+    eastern:
+      states: ["ct", "de", "dc", "fl", "ga", "me", "md", "ma", "nh", "nj", "ny", "nc", "oh", "pa", "ri", "sc", "vt", "va", "wv"]
+      schedules:
+        - name: "football_scrape_eastern_1"
+          cron: "*/3 21-23 * * 3,4,5"  # 9PM-11PM UTC (5PM-7PM ET)
+          description: "Eastern timezone scraping 5PM-7PM local"
+        - name: "football_scrape_eastern_2"
+          cron: "0-30/3 0-3 * * 4,5,6"  # 12AM-3AM UTC next day (7PM-11:30PM ET)
+          description: "Eastern timezone scraping 7PM-11:30PM local"
+    
+    central:
+      states: ["al", "ar", "fl", "ia", "il", "in", "ky", "la", "mi", "mn", "ms", "mo", "tn", "tx", "wi"]
+      schedules:
+        - name: "football_scrape_central_1"
+          cron: "*/3 22-23 * * 3,4,5"  # 10PM-11PM UTC (5PM-6PM CT)
+          description: "Central timezone scraping 5PM-6PM local"
+        - name: "football_scrape_central_2"
+          cron: "0-30/3 0-4 * * 4,5,6"  # 12AM-4AM UTC next day (6PM-11:30PM CT)
+          description: "Central timezone scraping 6PM-11:30PM local"
+    
+    mountain:
+      states: ["az", "co", "id", "ks", "mt", "ne", "nm", "nd", "ok", "sd", "ut", "wy"]
+      schedules:
+        - name: "football_scrape_mountain_1"
+          cron: "*/3 23 * * 3,4,5"  # 11PM UTC (5PM MT)
+          description: "Mountain timezone scraping 5PM local"
+        - name: "football_scrape_mountain_2"
+          cron: "0-30/3 0-5 * * 4,5,6"  # 12AM-5AM UTC next day (6PM-11:30PM MT)
+          description: "Mountain timezone scraping 6PM-11:30PM local"
+    
+    pacific:
+      states: ["ca", "nv", "or", "wa"]
+      schedules:
+        - name: "football_scrape_pacific_1"
+          cron: "0-30/3 0-6 * * 4,5,6"  # 12AM-6AM UTC next day (5PM-11:30PM PT)
+          description: "Pacific timezone scraping 5PM-11:30PM local"
+    
+    alaska:
+      states: ["ak"]
+      schedules:
+        - name: "football_scrape_alaska_1"
+          cron: "0-30/3 1-7 * * 4,5,6"  # 1AM-7AM UTC next day (5PM-11:30PM AKT)
+          description: "Alaska timezone scraping 5PM-11:30PM local"
+    
+    hawaii:
+      states: ["hi"]
+      schedules:
+        - name: "football_scrape_hawaii_1"
+          cron: "0-30/3 3-9 * * 4,5,6"  # 3AM-9AM UTC next day (5PM-11:30PM HT)
+          description: "Hawaii timezone scraping 5PM-11:30PM local"
+
+# Football finalization schedules
+# Runs at 12:30AM local time after game days (Fri, Sat, Sun mornings)
+football_finalization:
+  enabled: true
+  sport: "football"
+  
+  timezones:
+    eastern:
+      states: ["ct", "de", "dc", "fl", "ga", "me", "md", "ma", "nh", "nj", "ny", "nc", "oh", "pa", "ri", "sc", "vt", "va", "wv"]
+      name: "football_finalize_eastern"
+      cron: "30 4 * * 5,6,0"  # 4:30AM UTC (12:30AM ET)
+      description: "Eastern timezone finalization 12:30AM local"
+    
+    central:
+      states: ["al", "ar", "fl", "ia", "il", "in", "ky", "la", "mi", "mn", "ms", "mo", "tn", "tx", "wi"]
+      name: "football_finalize_central"
+      cron: "30 5 * * 5,6,0"  # 5:30AM UTC (12:30AM CT)
+      description: "Central timezone finalization 12:30AM local"
+    
+    mountain:
+      states: ["az", "co", "id", "ks", "mt", "ne", "nm", "nd", "ok", "sd", "ut", "wy"]
+      name: "football_finalize_mountain"
+      cron: "30 6 * * 5,6,0"  # 6:30AM UTC (12:30AM MT)
+      description: "Mountain timezone finalization 12:30AM local"
+    
+    pacific:
+      states: ["ca", "nv", "or", "wa"]
+      name: "football_finalize_pacific"
+      cron: "30 7 * * 5,6,0"  # 7:30AM UTC (12:30AM PT)
+      description: "Pacific timezone finalization 12:30AM local"
+    
+    alaska:
+      states: ["ak"]
+      name: "football_finalize_alaska"
+      cron: "30 8 * * 5,6,0"  # 8:30AM UTC (12:30AM AKT)
+      description: "Alaska timezone finalization 12:30AM local"
+    
+    hawaii:
+      states: ["hi"]
+      name: "football_finalize_hawaii"
+      cron: "30 10 * * 5,6,0"  # 10:30AM UTC (12:30AM HT)
+      description: "Hawaii timezone finalization 12:30AM local"
+
+# Schedule metadata
+metadata:
+  created_from: "Supabase SQL cron schedules"
+  game_days: ["Thursday", "Friday", "Saturday"]
+  game_hours_local: "5:00 PM - 11:30 PM"
+  finalize_time_local: "12:30 AM (after game day)"
+  scrape_frequency: "Every 3 minutes during game hours"
+  total_schedules: 
+    scraping: 10  # Multiple schedules per timezone to cover game window
+    finalization: 6  # One per timezone
+  
+  notes:
+    - "All cron schedules use UTC time"
+    - "Local times automatically account for Daylight Saving Time"
+    - "Hawaii doesn't observe Daylight Saving Time"
+    - "Football scraping runs every 3 minutes during game hours (5PM-11:30PM Thu-Sat)"
+    - "Football finalization runs once in the early morning after each game day"
+
+# Volleyball scheduling configuration
+# Runs every 15 minutes from 3PM-11PM local time daily
+volleyball_scraping:
+  enabled: true
+  sport: "volleyball"
+  force_run: true
+  game_hours_local: "3:00 PM - 11:00 PM"
+  scrape_frequency: "Every 15 minutes during game hours"
+  game_days: "Daily (volleyball season)"
+  
+  timezones:
+    eastern:
+      states: ["ct", "de", "dc", "fl", "ga", "me", "md", "ma", "nh", "nj", "ny", "nc", "oh", "pa", "ri", "sc", "vt", "va", "wv"]
+      schedules:
+        - name: "volleyball_scrape_eastern_1"
+          cron: "*/15 19-23 * * *"  # 7PM-11PM UTC (3PM-7PM ET)
+          description: "Eastern timezone volleyball scraping 3PM-7PM local"
+        - name: "volleyball_scrape_eastern_2"
+          cron: "*/15 0-3 * * *"  # 12AM-3AM UTC (8PM-11PM ET)
+          description: "Eastern timezone volleyball scraping 8PM-11PM local"
+
+    central:
+      states: ["al", "ar", "fl", "ia", "il", "in", "ky", "la", "mi", "mn", "ms", "mo", "tn", "tx", "wi"]
+      schedules:
+        - name: "volleyball_scrape_central_1"
+          cron: "*/15 20-23 * * *"  # 8PM-11PM UTC (3PM-6PM CT)
+          description: "Central timezone volleyball scraping 3PM-6PM local"
+        - name: "volleyball_scrape_central_2"
+          cron: "*/15 0-4 * * *"  # 12AM-4AM UTC (7PM-11PM CT)
+          description: "Central timezone volleyball scraping 7PM-11PM local"
+
+    mountain:
+      states: ["az", "co", "id", "ks", "mt", "ne", "nm", "nd", "ok", "sd", "ut", "wy"]
+      schedules:
+        - name: "volleyball_scrape_mountain_1"
+          cron: "*/15 21-23 * * *"  # 9PM-11PM UTC (3PM-5PM MT)
+          description: "Mountain timezone volleyball scraping 3PM-5PM local"
+        - name: "volleyball_scrape_mountain_2"
+          cron: "*/15 0-5 * * *"  # 12AM-5AM UTC (6PM-11PM MT)
+          description: "Mountain timezone volleyball scraping 6PM-11PM local"
+
+    pacific:
+      states: ["ca", "nv", "or", "wa"]
+      schedules:
+        - name: "volleyball_scrape_pacific_1"
+          cron: "*/15 22-23 * * *"  # 10PM-11PM UTC (3PM-4PM PT)
+          description: "Pacific timezone volleyball scraping 3PM-4PM local"
+        - name: "volleyball_scrape_pacific_2"
+          cron: "*/15 0-6 * * *"  # 12AM-6AM UTC (5PM-11PM PT)
+          description: "Pacific timezone volleyball scraping 5PM-11PM local"
+
+    alaska:
+      states: ["ak"]
+      schedules:
+        - name: "volleyball_scrape_alaska_1"
+          cron: "*/15 23 * * *"  # 11PM UTC (3PM AKT)
+          description: "Alaska timezone volleyball scraping 3PM local"
+        - name: "volleyball_scrape_alaska_2"
+          cron: "*/15 0-7 * * *"  # 12AM-7AM UTC (4PM-11PM AKT)
+          description: "Alaska timezone volleyball scraping 4PM-11PM local"
+
+    hawaii:
+      states: ["hi"]
+      schedules:
+        - name: "volleyball_scrape_hawaii_1"
+          cron: "*/15 1-9 * * *"  # 1AM-9AM UTC (3PM-11PM HT)
+          description: "Hawaii timezone volleyball scraping 3PM-11PM local"
+
+# Volleyball finalization schedules
+# Runs at 10:30PM local time daily (volleyball season can have games most days)
+volleyball_finalization:
+  enabled: true
+  sport: "volleyball"
+  finalize_time_local: "10:30 PM daily"
+  
+  timezones:
+    eastern:
+      states: ["ct", "de", "dc", "fl", "ga", "me", "md", "ma", "nh", "nj", "ny", "nc", "oh", "pa", "ri", "sc", "vt", "va", "wv"]
+      name: "volleyball_finalize_eastern"
+      cron: "30 3 * * 0,1,2,3,4,5,6"  # 3:30AM UTC (10:30PM ET previous day)
+      description: "Eastern timezone volleyball finalization 10:30PM local"
+
+    central:
+      states: ["al", "ar", "fl", "ia", "il", "in", "ky", "la", "mi", "mn", "ms", "mo", "tn", "tx", "wi"]
+      name: "volleyball_finalize_central"
+      cron: "30 3 * * 0,1,2,3,4,5,6"  # 3:30AM UTC (10:30PM CT previous day)
+      description: "Central timezone volleyball finalization 10:30PM local"
+
+    mountain:
+      states: ["az", "co", "id", "ks", "mt", "ne", "nm", "nd", "ok", "sd", "ut", "wy"]
+      name: "volleyball_finalize_mountain"
+      cron: "30 4 * * 0,1,2,3,4,5,6"  # 4:30AM UTC (10:30PM MT previous day)
+      description: "Mountain timezone volleyball finalization 10:30PM local"
+
+    pacific:
+      states: ["ca", "nv", "or", "wa"]
+      name: "volleyball_finalize_pacific"
+      cron: "30 5 * * 0,1,2,3,4,5,6"  # 5:30AM UTC (10:30PM PT previous day)
+      description: "Pacific timezone volleyball finalization 10:30PM local"
+
+    alaska:
+      states: ["ak"]
+      name: "volleyball_finalize_alaska"
+      cron: "30 6 * * 0,1,2,3,4,5,6"  # 6:30AM UTC (10:30PM AKT previous day)
+      description: "Alaska timezone volleyball finalization 10:30PM local"
+
+    hawaii:
+      states: ["hi"]
+      name: "volleyball_finalize_hawaii"
+      cron: "30 8 * * 0,1,2,3,4,5,6"  # 8:30AM UTC (10:30PM HT previous day)
+      description: "Hawaii timezone volleyball finalization 10:30PM local"
+
+# Combined schedule metadata
+combined_metadata:
+  total_schedules:
+    football_scraping: 10
+    football_finalization: 6
+    volleyball_scraping: 11
+    volleyball_finalization: 6
+    grand_total: 33
+
+  sports_coverage:
+    football:
+      game_days: ["Thursday", "Friday", "Saturday"]
+      game_hours: "5:00 PM - 11:30 PM local"
+      scrape_frequency: "Every 3 minutes"
+      finalize_time: "12:30 AM local (after game day)"
+    
+    volleyball:
+      game_days: "Daily during season"
+      game_hours: "3:00 PM - 11:00 PM local"
+      scrape_frequency: "Every 15 minutes"
+      finalize_time: "10:30 PM local daily"
+
+  deployment_options:
+    - "SPORT_SCHEDULES=football (football only)"
+    - "SPORT_SCHEDULES=volleyball (volleyball only)"
+    - "SPORT_SCHEDULES=all (both sports - default)"

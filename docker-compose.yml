@@ -1,0 +1,45 @@
+# docker-compose.yml - Example deployment configurations
+version: '3.8'
+
+services:
+  # API server mode (default)
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - STATES=${STATES:-al}
+      - SPORT=${SPORT:-football}
+      - SCRAPE_CONCURRENCY=${SCRAPE_CONCURRENCY:-2}
+      - ENABLE_SCHEDULER=false
+    restart: unless-stopped
+
+  # Scheduler mode - runs cron-like background tasks
+  scheduler:
+    build: .
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - STATES=${STATES:-al}
+      - SPORT=${SPORT:-football}
+      - SCRAPE_CONCURRENCY=${SCRAPE_CONCURRENCY:-2}
+      - ENABLE_SCHEDULER=true
+      - USE_TIMEZONE_SCHEDULES=${USE_TIMEZONE_SCHEDULES:-true}
+      - SCRAPE_SCHEDULE=${SCRAPE_SCHEDULE:-0 20 * * 3,4,5}
+      - FOOTBALL_SCHEDULE=${FOOTBALL_SCHEDULE:-0 21 * * 4}
+      - FINALIZE_SCHEDULE=${FINALIZE_SCHEDULE:-0 22 * * 3,4,5}
+      - FOOTBALL_FINALIZE_SCHEDULE=${FOOTBALL_FINALIZE_SCHEDULE:-0 8 * * 5}
+    restart: unless-stopped
+    
+  # One-time CLI execution example
+  # docker-compose run --rm cli scrape --states al,ga --sport football --force
+  cli:
+    build: .
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    profiles:
+      - cli
+    entrypoint: ["python", "cli.py"]
