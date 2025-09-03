@@ -1,5 +1,5 @@
 name: projects/prod-devdeviants/locations/us-central1/jobs/scale-up-score-processors
-schedule: 0 15 * * *
+schedule: 0 16 * * *
 timeZone: America/New_York
 attemptDeadline: 180s
 retryConfig:
