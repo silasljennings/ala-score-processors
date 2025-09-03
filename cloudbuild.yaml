@@ -68,7 +68,7 @@ steps:
             --http-method="$$METHOD" \
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
             --headers="$$HEADERS" \
-            --message-body="$$BODY" || \
+            --message-body="$$BODY" || true
           gcloud scheduler jobs update http "$$JOB_NAME-score-processor" \
             --location=us-central1 \
             --schedule="$$SCHEDULE" \
