@@ -65,7 +65,7 @@ steps:
             --schedule="$$SCHEDULE" \
             --time-zone="$$TIMEZONE" \
             --uri="$$URI" \
-            --http-method="$$METHOD" \
+            --http-method="POST" \
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
             --headers="$$HEADERS" \
             --message-body="$$BODY" || true
@@ -74,7 +74,7 @@ steps:
             --schedule="$$SCHEDULE" \
             --time-zone="$$TIMEZONE" \
             --uri="$$URI" \
-            --http-method="$$METHOD" \
+            --http-method="PUT" \
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
             --headers="$$HEADERS" \
             --message-body="$$BODY"
