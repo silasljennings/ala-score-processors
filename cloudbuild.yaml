@@ -30,7 +30,7 @@ steps:
           --min-instances=1 \
           --set-env-vars=SUPABASE_URL="$${SUPABASE_URL}",SUPABASE_SERVICE_ROLE_KEY="$${SUPABASE_SERVICE_ROLE_KEY}",ENABLE_SCHEDULER=true,USE_TIMEZONE_SCHEDULES=true,SPORT_SCHEDULES=seasonal
 
-  # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
+    # Step 4: Apply Cloud Scheduler jobs (scale-up / scale-down)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: bash
     args:
@@ -43,41 +43,41 @@ steps:
         echo "Syncing Cloud Scheduler jobs from YAML..."
 
         for FILE in scale-up-scheduler.yaml scale-down-scheduler.yaml; do
-          echo "Processing $FILE ..."
+          echo "Processing $$FILE ..."
         
-          NAME=$(basename $FILE .yaml)   # e.g. "scale-up-scheduler"
-          JOB_NAME=${NAME/-scheduler/}   # e.g. "scale-up" or "scale-down"
+          NAME=$$(basename $$FILE .yaml)   # e.g. "scale-up-scheduler"
+          JOB_NAME=$${NAME/-scheduler/}   # e.g. "scale-up" or "scale-down"
         
-          SCHEDULE=$(yq -r '.schedule' $FILE)
-          TIMEZONE=$(yq -r '.timeZone' $FILE)
-          URI=$(yq -r '.httpTarget.uri' $FILE)
-          METHOD=$(yq -r '.httpTarget.httpMethod' $FILE)
-          SERVICE_ACCOUNT=$(yq -r '.httpTarget.oidcToken.serviceAccountEmail' $FILE)
-          HEADERS=$(yq -r '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' $FILE)
-          BODY=$(yq -r '.httpTarget.body' $FILE)
+          SCHEDULE=$$(yq -r '.schedule' $$FILE)
+          TIMEZONE=$$(yq -r '.timeZone' $$FILE)
+          URI=$$(yq -r '.httpTarget.uri' $$FILE)
+          METHOD=$$(yq -r '.httpTarget.httpMethod' $$FILE)
+          SERVICE_ACCOUNT=$$(yq -r '.httpTarget.oidcToken.serviceAccountEmail' $$FILE)
+          HEADERS=$$(yq -r '.httpTarget.headers | to_entries | map(.key + "=" + .value) | join(",")' $$FILE)
+          BODY=$$(yq -r '.httpTarget.body' $$FILE)
 
           echo "Validating extracted values..."
-          echo "JOB=$JOB_NAME, SCHEDULE=$SCHEDULE, TIMEZONE=$TIMEZONE, URI=$URI, METHOD=$METHOD"
+          echo "JOB=$$JOB_NAME, SCHEDULE=$$SCHEDULE, TIMEZONE=$$TIMEZONE, URI=$$URI, METHOD=$$METHOD"
 
-          gcloud scheduler jobs create http "$JOB_NAME-score-processor" \
+          gcloud scheduler jobs create http "$$JOB_NAME-score-processor" \
             --location=us-central1 \
             --quiet \
-            --schedule="$SCHEDULE" \
-            --time-zone="$TIMEZONE" \
-            --uri="$URI" \
-            --http-method="$METHOD" \
-            --oidc-service-account-email="$SERVICE_ACCOUNT" \
-            --headers="$HEADERS" \
-            --message-body="$BODY" || \
-          gcloud scheduler jobs update http "$JOB_NAME-score-processor" \
+            --schedule="$$SCHEDULE" \
+            --time-zone="$$TIMEZONE" \
+            --uri="$$URI" \
+            --http-method="$$METHOD" \
+            --oidc-service-account-email="$$SERVICE_ACCOUNT" \
+            --headers="$$HEADERS" \
+            --message-body="$$BODY" || \
+          gcloud scheduler jobs update http "$$JOB_NAME-score-processor" \
             --location=us-central1 \
-            --schedule="$SCHEDULE" \
-            --time-zone="$TIMEZONE" \
-            --uri="$URI" \
-            --http-method="$METHOD" \
-            --oidc-service-account-email="$SERVICE_ACCOUNT" \
-            --headers="$HEADERS" \
-            --message-body="$BODY"
+            --schedule="$$SCHEDULE" \
+            --time-zone="$$TIMEZONE" \
+            --uri="$$URI" \
+            --http-method="$$METHOD" \
+            --oidc-service-account-email="$$SERVICE_ACCOUNT" \
+            --headers="$$HEADERS" \
+            --message-body="$$BODY"
         done
 
 
