@@ -103,6 +103,9 @@ Covers all US states across 6 timezones with proper local time handling:
 │   └── tasks.py               # Scheduled task definitions
 ├── finalize/
 │   └── score_finalizer.py     # Score finalization logic
+├── curls/                     # cURL example scripts
+│   ├── README.md              # cURL documentation
+│   ├── *.sh                   # Executable curl scripts
 ├── cli.py                     # Command line interface
 ├── docker-compose.yml         # Multi-service deployment
 ├── Dockerfile                 # Container definition
@@ -148,6 +151,28 @@ SCRAPE_RETRIES=2                                  # Retry failed requests
 - `POST /finalize` - Manual score finalization (requires X_ALA_KEY header)
 - `GET /health` - Health check with scheduler status
 - `GET /season` - Current season information
+
+### 🌐 cURL Examples
+
+Ready-to-use cURL commands are available in the `curls/` directory:
+
+```bash
+# Set authentication secret
+export ALA_SCORE_PROCESSOR_SECRET="your-secret-key"
+
+# Basic operations
+./curls/health.sh                    # Health check
+./curls/season.sh                    # Season info
+./curls/scrape.sh                    # Basic AL football scrape
+./curls/finalize.sh                  # Basic AL football finalize
+
+# Advanced operations
+./curls/scrape-multi-state.sh        # Multi-state volleyball
+./curls/scrape-date-override.sh      # Custom date scraping
+./curls/production-scrape.sh         # Production endpoint
+```
+
+See `curls/README.md` for complete documentation and examples.
 
 ### Scheduled Task Triggers
 - `POST /trigger/default_scrape` - Trigger default scraping

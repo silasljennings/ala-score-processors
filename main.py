@@ -2,7 +2,9 @@
 import os
 import asyncio
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from pydantic import BaseModel
+from typing import List, Optional
 from api.routes import scrape_handler, finalize_handler
 from scheduler.cron_scheduler import scheduler
 from scheduler.advanced_scheduler import advanced_scheduler
@@ -22,6 +24,29 @@ from config.seasonal_schedules import (
     get_available_seasons,
     get_season_info
 )
+
+
+# Request models for API endpoints
+class ScrapeRequest(BaseModel):
+    states: Optional[List[str]] = None
+    sport: Optional[str] = None
+    date: Optional[str] = None
+    force: Optional[bool] = False
+
+class FinalizeRequest(BaseModel):
+    states: Optional[List[str]] = None
+    sport: Optional[str] = None
+
+
+# Request wrapper to convert Pydantic models to FastAPI Request-like objects
+class RequestWrapper:
+    def __init__(self, body_data: dict, headers: dict = None):
+        self.body_data = body_data
+        self.query_params = {}
+        self.headers = headers or {}
+    
+    async def json(self):
+        return self.body_data
 
 
 # Background task lifecycle manager
@@ -144,14 +169,14 @@ async def get_season_endpoint():
 
 # Register scraping endpoint
 @app.post("/scrape")
-async def scrape_endpoint(request):
+async def scrape_endpoint(request: Request):
     """Endpoint to scrape sports scores from MaxPreps and store in database"""
     return await scrape_handler(request)
 
 
-# Register finalization endpoint
+# Register finalization endpoint  
 @app.post("/finalize")
-async def finalize_endpoint(request):
+async def finalize_endpoint(request: Request):
     """Endpoint to finalize scraped scores by updating contest states"""
     return await finalize_handler(request)
 
