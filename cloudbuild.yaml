@@ -44,17 +44,17 @@ steps:
         gcloud scheduler jobs create http scale-up-cron \
           --schedule "0 20 * * *" \
           --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PATCH \
+          --http-method PUT \
           --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/merge-patch+json" \
+          --headers "Content-Type=application/json" \
           --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"1"}}}}}' \
           --location us-central1 || \
         gcloud scheduler jobs update http scale-up-cron \
           --schedule "0 20 * * *" \
           --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PATCH \
+          --http-method PUT \
           --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/merge-patch+json" \
+          --headers "Content-Type=application/json" \
           --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"1"}}}}}' \
           --location us-central1
 
@@ -62,17 +62,17 @@ steps:
         gcloud scheduler jobs create http scale-down-cron \
           --schedule "0 12 * * *" \
           --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PATCH \
+          --http-method PUT \
           --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/merge-patch+json" \
+          --headers "Content-Type=application/json" \
           --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"0"}}}}}' \
           --location us-central1 || \
         gcloud scheduler jobs update http scale-down-cron \
           --schedule "0 12 * * *" \
           --uri "https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/$PROJECT_ID/services/$REPO_NAME" \
-          --http-method PATCH \
+          --http-method PUT \
           --oauth-service-account-email "$SERVICE_ACCOUNT" \
-          --headers "Content-Type=application/merge-patch+json" \
+          --headers "Content-Type=application/json" \
           --message-body '{"spec":{"template":{"metadata":{"annotations":{"autoscaling.knative.dev/minScale":"0"}}}}}' \
           --location us-central1
 
