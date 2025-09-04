@@ -9,12 +9,12 @@ retryConfig:
   minBackoffDuration: 5s
   retryCount: 3
 httpTarget:
-  uri: https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1/namespaces/prod-devdeviants/services/ala-score-processors
+  uri: https://ala-score-processors-1067313274433.us-central1.run.app
   httpMethod: POST
   headers:
     Content-Type: application/octet-stream
     User-Agent: Google-Cloud-Scheduler
   body:
   oidcToken:
-    scope: https://www.googleapis.com/auth/cloud-platform
+    audience: https://ala-score-processors-1067313274433.us-central1.run.app
     serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
