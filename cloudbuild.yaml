@@ -76,6 +76,8 @@ steps:
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
             --headers="$$HEADERS" \
             --message-body="$$BODY" || true
+        done
+
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA'
