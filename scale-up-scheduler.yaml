@@ -1,20 +1,21 @@
-name: projects/prod-devdeviants/locations/us-central1/jobs/scale-up-score-processors
-schedule: 0 16 * * *
-timeZone: America/New_York
 attemptDeadline: 180s
+httpTarget:
+  body: ewogICJ0ZW1wbGF0ZSI6IHsKICAgICJjb250YWluZXJzIjogWwogICAgICB7fQogICAgXSwKICAgICJzY2FsaW5nIjogewogICAgICAibWluSW5zdGFuY2VDb3VudCI6IDAKICAgIH0KICB9Cn0K
+  headers:
+    Content-Type: application/json
+    User-Agent: Google-Cloud-Scheduler
+  httpMethod: PATCH
+  oauthToken:
+    scope: https://www.googleapis.com/auth/cloud-platform
+    serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
+  uri: https://run.googleapis.com/v2/projects/prod-devdeviants/locations/us-central1/services/ala-score-processors?updateMask=template.scaling.minInstanceCount
+name: projects/prod-devdeviants/locations/us-central1/jobs/scale-up-score-processor
 retryConfig:
   maxBackoffDuration: 300s
   maxDoublings: 5
-  maxRetryDuration: 120s
+  maxRetryDuration: 180s
   minBackoffDuration: 5s
   retryCount: 3
-httpTarget:
-  uri: https://ala-score-processors-1067313274433.us-central1.run.app
-  httpMethod: POST
-  headers:
-    Content-Type: application/octet-stream
-    User-Agent: Google-Cloud-Scheduler
-  body:
-  oidcToken:
-    audience: https://ala-score-processors-1067313274433.us-central1.run.app
-    serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
+schedule: "0 16 * * *"
+state: ENABLED
+timeZone: America/New_York

@@ -1,23 +1,21 @@
 attemptDeadline: 180s
 httpTarget:
-  uri: https://ala-score-processors-1067313274433.us-central1.run.app
-  httpMethod: POST
+  body: ewogICJ0ZW1wbGF0ZSI6IHsKICAgICJjb250YWluZXJzIjogWwogICAgICB7fQogICAgXSwKICAgICJzY2FsaW5nIjogewogICAgICAibWluSW5zdGFuY2VDb3VudCI6IDAKICAgIH0KICB9Cn0K
   headers:
-    Content-Type: application/octet-stream
+    Content-Type: application/json
     User-Agent: Google-Cloud-Scheduler
-  body: |
-    ewogICJzcGVjIjogewogICAgInRlbXBsYXRlIjogewogICAgICAibWV0YWRhdGEiOiB7CiAgICAgICAgImFubm90YXRpb25zIjogewogICAgICAgICAgImF1dG9zY2FsaW5nLmtuYXRpdmUuZGV2L21pblNjYWxlIjogIjAiCiAgICAgICAgfQogICAgICB9CiAgICB9CiAgfQp9Cg==
-  oidcToken:
+  httpMethod: PATCH
+  oauthToken:
+    scope: https://www.googleapis.com/auth/cloud-platform
     serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
-    audience: https://ala-score-processors-1067313274433.us-central1.run.app
-
+  uri: https://run.googleapis.com/v2/projects/prod-devdeviants/locations/us-central1/services/ala-score-processors?updateMask=template.scaling.minInstanceCount
 name: projects/prod-devdeviants/locations/us-central1/jobs/scale-down-score-processor
-schedule: "0 2 * * *"
-timeZone: Pacific/Honolulu
 retryConfig:
-  retryCount: 3
-  maxRetryDuration: 180s
-  minBackoffDuration: 5s
   maxBackoffDuration: 300s
   maxDoublings: 5
+  maxRetryDuration: 180s
+  minBackoffDuration: 5s
+  retryCount: 3
+schedule: "0 2 * * *"
 state: ENABLED
+timeZone: Pacific/Honolulu
