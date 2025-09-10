@@ -72,10 +72,19 @@ steps:
             --schedule="$$SCHEDULE" \
             --time-zone="$$TIMEZONE" \
             --uri="$$URI" \
-            --http-method="PATCH" \
+            --http-method="POST" \
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
             --headers="$$HEADERS" \
             --message-body="$$BODY" || true
+          gcloud scheduler jobs update http "$$JOB_NAME-score-processor" \
+            --location=us-central1 \
+            --schedule="$$SCHEDULE" \
+            --time-zone="$$TIMEZONE" \
+            --uri="$$URI" \
+            --http-method="PUT" \
+            --oidc-service-account-email="$$SERVICE_ACCOUNT" \
+            --update-headers="$$HEADERS" \
+            --message-body="$$BODY"
         done
 
 

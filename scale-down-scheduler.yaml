@@ -13,7 +13,7 @@ httpTarget:
   headers:
     Content-Type: application/json
     User-Agent: Google-Cloud-Scheduler
-  httpMethod: PATCH
+  httpMethod: POST
   oauthToken:
     scope: https://www.googleapis.com/auth/cloud-platform
     serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
