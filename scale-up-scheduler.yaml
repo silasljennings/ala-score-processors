@@ -17,7 +17,7 @@ httpTarget:
   oauthToken:
     scope: https://www.googleapis.com/auth/cloud-platform
     serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
-  uri: https://run.googleapis.com/v2/projects/prod-devdeviants/locations/us-central1/services/ala-score-processors?updateMask=template.scaling.minInstanceCount
+  uri: https://run.googleapis.com/v2/projects/prod-devdeviants/locations/us-central1/services/ala-score-processors
 name: projects/prod-devdeviants/locations/us-central1/jobs/scale-up-score-processor
 retryConfig:
   maxBackoffDuration: 300s
