@@ -72,21 +72,10 @@ steps:
             --schedule="$$SCHEDULE" \
             --time-zone="$$TIMEZONE" \
             --uri="$$URI" \
-            --http-method="POST" \
+            --http-method="PATCH" \
             --oidc-service-account-email="$$SERVICE_ACCOUNT" \
             --headers="$$HEADERS" \
             --message-body="$$BODY" || true
-          gcloud scheduler jobs update http "$$JOB_NAME-score-processor" \
-            --location=us-central1 \
-            --schedule="$$SCHEDULE" \
-            --time-zone="$$TIMEZONE" \
-            --uri="$$URI" \
-            --http-method="PUT" \
-            --oidc-service-account-email="$$SERVICE_ACCOUNT" \
-            --update-headers="$$HEADERS" \
-            --message-body="$$BODY"
-        done
-
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$REPO_NAME:$SHORT_SHA'

@@ -1,10 +1,19 @@
 attemptDeadline: 180s
 httpTarget:
-  body: ewogICJ0ZW1wbGF0ZSI6IHsKICAgICJjb250YWluZXJzIjogWwogICAgICB7fQogICAgXSwKICAgICJzY2FsaW5nIjogewogICAgICAibWluSW5zdGFuY2VDb3VudCI6IDAKICAgIH0KICB9Cn0K
+  body: '{
+    "template": {
+      "containers": [
+        {}
+      ],
+      "scaling": {
+        "minInstanceCount": 0
+      }
+    }
+  }'
   headers:
     Content-Type: application/json
     User-Agent: Google-Cloud-Scheduler
-  httpMethod: POST
+  httpMethod: PATCH
   oauthToken:
     scope: https://www.googleapis.com/auth/cloud-platform
     serviceAccountEmail: 1067313274433-compute@developer.gserviceaccount.com
