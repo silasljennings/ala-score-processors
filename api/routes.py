@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from config.settings import get_states_list, get_scrape_concurrency, get_batch_pause_ms, get_default_sport, get_ala_score_processor_secret
 from utils.time_helpers import within_run_window_ny, today_mdy_ny
 from utils.data_helpers import to_mdy
-from utils.url_helpers import build_scores_url
+from utils.url_helpers import build_scores_url_from_sport
 from scraper.web_client import fetch_state_page, sleep
 from scraper.score_scraper import scrape
 from database.supabase_client import dedupe_by_contest_id, chunked_upsert
@@ -80,7 +80,7 @@ async def scrape_handler(request: Request) -> JSONResponse:
         
         for idx, state_code in enumerate(batch):
             await sleep(idx * 15)
-            url = build_scores_url(state_code, date_str, sport)
+            url = build_scores_url_from_sport(state_code, date_str, sport)
             tasks.append(fetch_state_page(url, f"{req_id}/{state_code}"))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -89,7 +89,7 @@ async def scrape_handler(request: Request) -> JSONResponse:
             if isinstance(html, Exception):
                 meta.append({"state_code": state_code, "error": str(html)})
             else:
-                r = scrape(html, build_scores_url(state_code, date_str, sport), state_code, sport)
+                r = scrape(html, build_scores_url_from_sport(state_code, date_str, sport), state_code, sport)
                 rows.extend(r)
                 meta.append({"state_code": state_code, "count": len(r)})
 

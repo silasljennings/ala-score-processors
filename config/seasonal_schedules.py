@@ -7,23 +7,23 @@ import pytz
 SEASONAL_SPORTS = {
     "fall": {
         "months": [8, 9, 10, 11],  # August - November
-        "sports": ["football", "volleyball"],
-        "description": "Fall season - Football and Volleyball"
+        "sports": ["football", "volleyball-girls", "volleyball-boys"],
+        "description": "Fall season - Football and Volleyball (Boys & Girls)"
     },
     "late_fall": {
         "months": [11, 12],  # November - December
-        "sports": ["football", "volleyball", "basketball"],
-        "description": "Late Fall season - Football, Volleyball, and Basketball"
+        "sports": ["football", "volleyball-girls", "volleyball-boys", "basketball-boys", "basketball-girls"],
+        "description": "Late Fall season - Football, Volleyball (Boys & Girls), and Basketball (Boys & Girls)"
     },
     "winter": {
         "months": [12, 1, 2],  # December - February
-        "sports": ["basketball"],
-        "description": "Winter season - Basketball"
+        "sports": ["basketball-boys", "basketball-girls"],
+        "description": "Winter season - Basketball (Boys & Girls)"
     },
     "late_winter": {
         "months": [2, 3],  # February - March
-        "sports": ["basketball", "baseball", "soccer", "softball"],
-        "description": "Late Winter season - Basketball, Baseball, Soccer, and Softball"
+        "sports": ["basketball-boys", "basketball-girls", "baseball", "soccer", "softball"],
+        "description": "Late Winter season - Basketball (Boys & Girls), Baseball, Soccer, and Softball"
     },
     "spring": {
         "months": [3, 4, 5, 6],  # March - June
@@ -34,7 +34,7 @@ SEASONAL_SPORTS = {
 
 
 # Sports that we currently have scheduling implemented for
-IMPLEMENTED_SPORTS = ["football", "volleyball"]
+IMPLEMENTED_SPORTS = ["football", "volleyball-girls", "volleyball-boys", "basketball-boys", "basketball-girls"]
 
 
 # Get current season based on date

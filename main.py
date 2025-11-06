@@ -64,8 +64,14 @@ async def lifespan(app: FastAPI):
             
             if sport_filter == "football":
                 advanced_scheduler.setup_football_schedules()
-            elif sport_filter == "volleyball":
-                advanced_scheduler.setup_volleyball_schedules()
+            elif sport_filter == "volleyball-girls":
+                advanced_scheduler.setup_volleyball_girls_schedules()
+            elif sport_filter == "volleyball-boys":
+                advanced_scheduler.setup_volleyball_boys_schedules()
+            elif sport_filter == "basketball-boys":
+                advanced_scheduler.setup_basketball_boys_schedules()
+            elif sport_filter == "basketball-girls":
+                advanced_scheduler.setup_basketball_girls_schedules()
             elif sport_filter == "all":
                 advanced_scheduler.setup_all_sports_schedules()
             elif sport_filter == "seasonal" or sport_filter in get_available_seasons():
@@ -207,7 +213,7 @@ async def trigger_scheduled_task(task_name: str):
 async def trigger_timezone_task(action: str, timezone: str, sport: str = "football"):
     """Manually trigger a timezone-specific task"""
     available_timezones = get_available_timezones()
-    available_sports = ["football", "volleyball"]
+    available_sports = ["football", "volleyball-girls", "volleyball-boys", "basketball-boys", "basketball-girls"]
     
     if timezone not in available_timezones:
         return {"error": f"Unknown timezone: {timezone}", "available_timezones": available_timezones}
@@ -228,24 +234,93 @@ async def trigger_timezone_task(action: str, timezone: str, sport: str = "footba
         return {"error": str(e)}
 
 
-# Manual trigger endpoint for volleyball tasks across all timezones
-@app.post("/trigger/volleyball/{action}")
-async def trigger_volleyball_all_timezones(action: str):
-    """Manually trigger volleyball tasks for all timezones"""
+# Manual trigger endpoint for volleyball girls tasks across all timezones
+@app.post("/trigger/volleyball-girls/{action}")
+async def trigger_volleyball_girls_all_timezones(action: str):
+    """Manually trigger volleyball girls tasks for all timezones"""
     available_timezones = get_available_timezones()
     results = {}
-    
+
     try:
         for timezone in available_timezones:
             if action == "scrape":
-                result = await manual_timezone_scrape(timezone, "volleyball")
+                result = await manual_timezone_scrape(timezone, "volleyball-girls")
                 results[timezone] = {"status": "success", "result": result}
             elif action == "finalize":
-                result = await manual_timezone_finalize(timezone, "volleyball")
+                result = await manual_timezone_finalize(timezone, "volleyball-girls")
                 results[timezone] = {"status": "success", "result": result}
             else:
                 return {"error": f"Unknown action: {action}", "available_actions": ["scrape", "finalize"]}
-        
-        return {"triggered": f"volleyball_{action}_all", "results": results}
+
+        return {"triggered": f"volleyball_girls_{action}_all", "results": results}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# Manual trigger endpoint for volleyball boys tasks across all timezones
+@app.post("/trigger/volleyball-boys/{action}")
+async def trigger_volleyball_boys_all_timezones(action: str):
+    """Manually trigger volleyball boys tasks for all timezones"""
+    available_timezones = get_available_timezones()
+    results = {}
+
+    try:
+        for timezone in available_timezones:
+            if action == "scrape":
+                result = await manual_timezone_scrape(timezone, "volleyball-boys")
+                results[timezone] = {"status": "success", "result": result}
+            elif action == "finalize":
+                result = await manual_timezone_finalize(timezone, "volleyball-boys")
+                results[timezone] = {"status": "success", "result": result}
+            else:
+                return {"error": f"Unknown action: {action}", "available_actions": ["scrape", "finalize"]}
+
+        return {"triggered": f"volleyball_boys_{action}_all", "results": results}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# Manual trigger endpoint for basketball boys tasks across all timezones
+@app.post("/trigger/basketball-boys/{action}")
+async def trigger_basketball_boys_all_timezones(action: str):
+    """Manually trigger basketball boys tasks for all timezones"""
+    available_timezones = get_available_timezones()
+    results = {}
+
+    try:
+        for timezone in available_timezones:
+            if action == "scrape":
+                result = await manual_timezone_scrape(timezone, "basketball-boys")
+                results[timezone] = {"status": "success", "result": result}
+            elif action == "finalize":
+                result = await manual_timezone_finalize(timezone, "basketball-boys")
+                results[timezone] = {"status": "success", "result": result}
+            else:
+                return {"error": f"Unknown action: {action}", "available_actions": ["scrape", "finalize"]}
+
+        return {"triggered": f"basketball_boys_{action}_all", "results": results}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# Manual trigger endpoint for basketball girls tasks across all timezones
+@app.post("/trigger/basketball-girls/{action}")
+async def trigger_basketball_girls_all_timezones(action: str):
+    """Manually trigger basketball girls tasks for all timezones"""
+    available_timezones = get_available_timezones()
+    results = {}
+
+    try:
+        for timezone in available_timezones:
+            if action == "scrape":
+                result = await manual_timezone_scrape(timezone, "basketball-girls")
+                results[timezone] = {"status": "success", "result": result}
+            elif action == "finalize":
+                result = await manual_timezone_finalize(timezone, "basketball-girls")
+                results[timezone] = {"status": "success", "result": result}
+            else:
+                return {"error": f"Unknown action: {action}", "available_actions": ["scrape", "finalize"]}
+
+        return {"triggered": f"basketball_girls_{action}_all", "results": results}
     except Exception as e:
         return {"error": str(e)}

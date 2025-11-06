@@ -2,12 +2,16 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from utils.data_helpers import clean_team_name
-from utils.url_helpers import parse_date_from_url
+from utils.url_helpers import parse_date_from_url, parse_compound_sport
 
 
 # Parse HTML and extract game data from MaxPreps scores page
 def scrape(html: str, page_url: str, state_code: str, sport: str) -> list[dict]:
     """Parse MaxPreps HTML and extract game scores and metadata"""
+    # Parse gender information from sport name
+    base_sport, gender_suffix = parse_compound_sport(sport)
+    # Convert gender suffix to database format
+    gender = "Female" if gender_suffix == "girls" else "Male"
     doc = BeautifulSoup(html, "html.parser")
     boxes = doc.select("li.c .contest-box-item")
     out = []
@@ -67,7 +71,8 @@ def scrape(html: str, page_url: str, state_code: str, sport: str) -> list[dict]:
                     "team2_is_winner": t2["isWinner"],
                     "team2_result_code": t2["resultCode"],
                     "scraped_at": datetime.utcnow().isoformat(),
-                    "sport": sport.upper(),
+                    "sport": base_sport.upper(),
+                    "gender": gender,
                 }
             )
     return out

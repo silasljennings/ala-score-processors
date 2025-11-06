@@ -3,10 +3,16 @@ import os
 from datetime import datetime
 from typing import Callable, Dict, List
 from config.timezone_schedules import (
-    FOOTBALL_SCRAPE_SCHEDULES, 
+    FOOTBALL_SCRAPE_SCHEDULES,
     FOOTBALL_FINALIZE_SCHEDULES,
-    VOLLEYBALL_SCRAPE_SCHEDULES,
-    VOLLEYBALL_FINALIZE_SCHEDULES,
+    VOLLEYBALL_GIRLS_SCRAPE_SCHEDULES,
+    VOLLEYBALL_GIRLS_FINALIZE_SCHEDULES,
+    VOLLEYBALL_BOYS_SCRAPE_SCHEDULES,
+    VOLLEYBALL_BOYS_FINALIZE_SCHEDULES,
+    BASKETBALL_BOYS_SCRAPE_SCHEDULES,
+    BASKETBALL_BOYS_FINALIZE_SCHEDULES,
+    BASKETBALL_GIRLS_SCRAPE_SCHEDULES,
+    BASKETBALL_GIRLS_FINALIZE_SCHEDULES,
     get_states_for_timezone
 )
 from config.seasonal_schedules import (
@@ -84,57 +90,198 @@ class AdvancedCronScheduler:
         
         print(f"Total football scheduled tasks: {len(self.tasks)}")
 
-    # Add timezone-aware volleyball scraping schedules  
-    def setup_volleyball_schedules(self):
-        """Setup all volleyball scraping and finalization schedules for all timezones"""
-        print("Setting up timezone-aware volleyball schedules...")
-        
+    # Add timezone-aware volleyball girls scraping schedules
+    def setup_volleyball_girls_schedules(self):
+        """Setup all volleyball girls scraping and finalization schedules for all timezones"""
+        print("Setting up timezone-aware volleyball girls schedules...")
+
         # Add scraping schedules for each timezone
-        for timezone_name, schedules in VOLLEYBALL_SCRAPE_SCHEDULES.items():
+        for timezone_name, schedules in VOLLEYBALL_GIRLS_SCRAPE_SCHEDULES.items():
             states = get_states_for_timezone(timezone_name)
             if not states:
                 continue
-                
+
             for schedule_config in schedules:
-                # Create timezone-specific volleyball scraping task
-                async def create_volleyball_scrape_task(tz_name=timezone_name, sport="volleyball"):
+                # Create timezone-specific volleyball girls scraping task
+                async def create_volleyball_girls_scrape_task(tz_name=timezone_name, sport="volleyball-girls"):
                     return await manual_timezone_scrape(tz_name, sport)
-                
-                create_volleyball_scrape_task.__name__ = schedule_config["name"]
-                
+
+                create_volleyball_girls_scrape_task.__name__ = schedule_config["name"]
+
                 self.schedule(
                     schedule_config["cron"],
-                    create_volleyball_scrape_task,
+                    create_volleyball_girls_scrape_task,
                     schedule_config["name"]
                 )
-                print(f"  Added volleyball scrape: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
-        
+                print(f"  Added volleyball girls scrape: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
         # Add finalization schedules for each timezone
-        for timezone_name, schedule_config in VOLLEYBALL_FINALIZE_SCHEDULES.items():
+        for timezone_name, schedule_config in VOLLEYBALL_GIRLS_FINALIZE_SCHEDULES.items():
             states = get_states_for_timezone(timezone_name)
             if not states:
                 continue
-                
-            # Create timezone-specific volleyball finalization task
-            async def create_volleyball_finalize_task(tz_name=timezone_name, sport="volleyball"):
+
+            # Create timezone-specific volleyball girls finalization task
+            async def create_volleyball_girls_finalize_task(tz_name=timezone_name, sport="volleyball-girls"):
                 return await manual_timezone_finalize(tz_name, sport)
-            
-            create_volleyball_finalize_task.__name__ = schedule_config["name"]
-            
+
+            create_volleyball_girls_finalize_task.__name__ = schedule_config["name"]
+
             self.schedule(
                 schedule_config["cron"],
-                create_volleyball_finalize_task,
+                create_volleyball_girls_finalize_task,
                 schedule_config["name"]
             )
-            print(f"  Added volleyball finalize: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
-        
-        print(f"Total volleyball scheduled tasks: {len(self.tasks) - len(FOOTBALL_SCRAPE_SCHEDULES)*2 - len(FOOTBALL_FINALIZE_SCHEDULES)}")
+            print(f"  Added volleyball girls finalize: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        print(f"Total volleyball girls scheduled tasks: {len(VOLLEYBALL_GIRLS_SCRAPE_SCHEDULES)*2 + len(VOLLEYBALL_GIRLS_FINALIZE_SCHEDULES)}")
+
+    # Add timezone-aware volleyball boys scraping schedules
+    def setup_volleyball_boys_schedules(self):
+        """Setup all volleyball boys scraping and finalization schedules for all timezones"""
+        print("Setting up timezone-aware volleyball boys schedules...")
+
+        # Add scraping schedules for each timezone
+        for timezone_name, schedules in VOLLEYBALL_BOYS_SCRAPE_SCHEDULES.items():
+            states = get_states_for_timezone(timezone_name)
+            if not states:
+                continue
+
+            for schedule_config in schedules:
+                # Create timezone-specific volleyball boys scraping task
+                async def create_volleyball_boys_scrape_task(tz_name=timezone_name, sport="volleyball-boys"):
+                    return await manual_timezone_scrape(tz_name, sport)
+
+                create_volleyball_boys_scrape_task.__name__ = schedule_config["name"]
+
+                self.schedule(
+                    schedule_config["cron"],
+                    create_volleyball_boys_scrape_task,
+                    schedule_config["name"]
+                )
+                print(f"  Added volleyball boys scrape: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        # Add finalization schedules for each timezone
+        for timezone_name, schedule_config in VOLLEYBALL_BOYS_FINALIZE_SCHEDULES.items():
+            states = get_states_for_timezone(timezone_name)
+            if not states:
+                continue
+
+            # Create timezone-specific volleyball boys finalization task
+            async def create_volleyball_boys_finalize_task(tz_name=timezone_name, sport="volleyball-boys"):
+                return await manual_timezone_finalize(tz_name, sport)
+
+            create_volleyball_boys_finalize_task.__name__ = schedule_config["name"]
+
+            self.schedule(
+                schedule_config["cron"],
+                create_volleyball_boys_finalize_task,
+                schedule_config["name"]
+            )
+            print(f"  Added volleyball boys finalize: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        print(f"Total volleyball boys scheduled tasks: {len(VOLLEYBALL_BOYS_SCRAPE_SCHEDULES)*2 + len(VOLLEYBALL_BOYS_FINALIZE_SCHEDULES)}")
+
+    # Add timezone-aware basketball boys scraping schedules
+    def setup_basketball_boys_schedules(self):
+        """Setup all basketball boys scraping and finalization schedules for all timezones"""
+        print("Setting up timezone-aware basketball boys schedules...")
+
+        # Add scraping schedules for each timezone
+        for timezone_name, schedules in BASKETBALL_BOYS_SCRAPE_SCHEDULES.items():
+            states = get_states_for_timezone(timezone_name)
+            if not states:
+                continue
+
+            for schedule_config in schedules:
+                # Create timezone-specific basketball boys scraping task
+                async def create_basketball_boys_scrape_task(tz_name=timezone_name, sport="basketball-boys"):
+                    return await manual_timezone_scrape(tz_name, sport)
+
+                create_basketball_boys_scrape_task.__name__ = schedule_config["name"]
+
+                self.schedule(
+                    schedule_config["cron"],
+                    create_basketball_boys_scrape_task,
+                    schedule_config["name"]
+                )
+                print(f"  Added basketball boys scrape: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        # Add finalization schedules for each timezone
+        for timezone_name, schedule_config in BASKETBALL_BOYS_FINALIZE_SCHEDULES.items():
+            states = get_states_for_timezone(timezone_name)
+            if not states:
+                continue
+
+            # Create timezone-specific basketball boys finalization task
+            async def create_basketball_boys_finalize_task(tz_name=timezone_name, sport="basketball-boys"):
+                return await manual_timezone_finalize(tz_name, sport)
+
+            create_basketball_boys_finalize_task.__name__ = schedule_config["name"]
+
+            self.schedule(
+                schedule_config["cron"],
+                create_basketball_boys_finalize_task,
+                schedule_config["name"]
+            )
+            print(f"  Added basketball boys finalize: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        print(f"Total basketball boys scheduled tasks: {len(BASKETBALL_BOYS_SCRAPE_SCHEDULES)*2 + len(BASKETBALL_BOYS_FINALIZE_SCHEDULES)}")
+
+    # Add timezone-aware basketball girls scraping schedules
+    def setup_basketball_girls_schedules(self):
+        """Setup all basketball girls scraping and finalization schedules for all timezones"""
+        print("Setting up timezone-aware basketball girls schedules...")
+
+        # Add scraping schedules for each timezone
+        for timezone_name, schedules in BASKETBALL_GIRLS_SCRAPE_SCHEDULES.items():
+            states = get_states_for_timezone(timezone_name)
+            if not states:
+                continue
+
+            for schedule_config in schedules:
+                # Create timezone-specific basketball girls scraping task
+                async def create_basketball_girls_scrape_task(tz_name=timezone_name, sport="basketball-girls"):
+                    return await manual_timezone_scrape(tz_name, sport)
+
+                create_basketball_girls_scrape_task.__name__ = schedule_config["name"]
+
+                self.schedule(
+                    schedule_config["cron"],
+                    create_basketball_girls_scrape_task,
+                    schedule_config["name"]
+                )
+                print(f"  Added basketball girls scrape: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        # Add finalization schedules for each timezone
+        for timezone_name, schedule_config in BASKETBALL_GIRLS_FINALIZE_SCHEDULES.items():
+            states = get_states_for_timezone(timezone_name)
+            if not states:
+                continue
+
+            # Create timezone-specific basketball girls finalization task
+            async def create_basketball_girls_finalize_task(tz_name=timezone_name, sport="basketball-girls"):
+                return await manual_timezone_finalize(tz_name, sport)
+
+            create_basketball_girls_finalize_task.__name__ = schedule_config["name"]
+
+            self.schedule(
+                schedule_config["cron"],
+                create_basketball_girls_finalize_task,
+                schedule_config["name"]
+            )
+            print(f"  Added basketball girls finalize: {schedule_config['name']} ({schedule_config['cron']}) - {schedule_config['description']}")
+
+        print(f"Total basketball girls scheduled tasks: {len(BASKETBALL_GIRLS_SCRAPE_SCHEDULES)*2 + len(BASKETBALL_GIRLS_FINALIZE_SCHEDULES)}")
 
     # Setup all sports schedules
     def setup_all_sports_schedules(self):
-        """Setup schedules for all sports (football + volleyball)"""
+        """Setup schedules for all sports (football + volleyball + basketball)"""
         self.setup_football_schedules()
-        self.setup_volleyball_schedules()
+        self.setup_volleyball_girls_schedules()
+        self.setup_volleyball_boys_schedules()
+        self.setup_basketball_boys_schedules()
+        self.setup_basketball_girls_schedules()
         print(f"Total all sports scheduled tasks: {len(self.tasks)}")
 
     # Setup seasonal sports schedules
@@ -158,12 +305,19 @@ class AdvancedCronScheduler:
             if sport == "football":
                 self.setup_football_schedules()
                 print(f"✓ Added football schedules")
-            elif sport == "volleyball":
-                self.setup_volleyball_schedules()
-                print(f"✓ Added volleyball schedules")
+            elif sport == "volleyball-girls":
+                self.setup_volleyball_girls_schedules()
+                print(f"✓ Added volleyball girls schedules")
+            elif sport == "volleyball-boys":
+                self.setup_volleyball_boys_schedules()
+                print(f"✓ Added volleyball boys schedules")
+            elif sport == "basketball-boys":
+                self.setup_basketball_boys_schedules()
+                print(f"✓ Added basketball boys schedules")
+            elif sport == "basketball-girls":
+                self.setup_basketball_girls_schedules()
+                print(f"✓ Added basketball girls schedules")
             # Future sports would be added here
-            # elif sport == "basketball":
-            #     self.setup_basketball_schedules()
             # elif sport == "baseball":
             #     self.setup_baseball_schedules()
             # etc.

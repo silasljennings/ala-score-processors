@@ -84,28 +84,100 @@ async def run_timezone_finalize_task(args):
     print(f"Timezone {sport} finalize completed for {args.timezone}: {result}")
 
 
-# Run volleyball scraping task for all timezones
-async def run_volleyball_scrape_all_task(args):
-    """Execute volleyball scraping for all timezones"""
+# Run volleyball girls scraping task for all timezones
+async def run_volleyball_girls_scrape_all_task(args):
+    """Execute volleyball girls scraping for all timezones"""
     timezones = get_available_timezones()
     for timezone in timezones:
         try:
-            result = await manual_timezone_scrape(timezone, "volleyball")
-            print(f"Volleyball scrape completed for {timezone}: {result}")
+            result = await manual_timezone_scrape(timezone, "volleyball-girls")
+            print(f"Volleyball girls scrape completed for {timezone}: {result}")
         except Exception as e:
-            print(f"Error scraping volleyball for {timezone}: {e}")
+            print(f"Error scraping volleyball girls for {timezone}: {e}")
 
 
-# Run volleyball finalization task for all timezones  
-async def run_volleyball_finalize_all_task(args):
-    """Execute volleyball finalization for all timezones"""
+# Run volleyball girls finalization task for all timezones
+async def run_volleyball_girls_finalize_all_task(args):
+    """Execute volleyball girls finalization for all timezones"""
     timezones = get_available_timezones()
     for timezone in timezones:
         try:
-            result = await manual_timezone_finalize(timezone, "volleyball")
-            print(f"Volleyball finalize completed for {timezone}: {result}")
+            result = await manual_timezone_finalize(timezone, "volleyball-girls")
+            print(f"Volleyball girls finalize completed for {timezone}: {result}")
         except Exception as e:
-            print(f"Error finalizing volleyball for {timezone}: {e}")
+            print(f"Error finalizing volleyball girls for {timezone}: {e}")
+
+
+# Run volleyball boys scraping task for all timezones
+async def run_volleyball_boys_scrape_all_task(args):
+    """Execute volleyball boys scraping for all timezones"""
+    timezones = get_available_timezones()
+    for timezone in timezones:
+        try:
+            result = await manual_timezone_scrape(timezone, "volleyball-boys")
+            print(f"Volleyball boys scrape completed for {timezone}: {result}")
+        except Exception as e:
+            print(f"Error scraping volleyball boys for {timezone}: {e}")
+
+
+# Run volleyball boys finalization task for all timezones
+async def run_volleyball_boys_finalize_all_task(args):
+    """Execute volleyball boys finalization for all timezones"""
+    timezones = get_available_timezones()
+    for timezone in timezones:
+        try:
+            result = await manual_timezone_finalize(timezone, "volleyball-boys")
+            print(f"Volleyball boys finalize completed for {timezone}: {result}")
+        except Exception as e:
+            print(f"Error finalizing volleyball boys for {timezone}: {e}")
+
+
+# Run basketball boys scraping task for all timezones
+async def run_basketball_boys_scrape_all_task(args):
+    """Execute basketball boys scraping for all timezones"""
+    timezones = get_available_timezones()
+    for timezone in timezones:
+        try:
+            result = await manual_timezone_scrape(timezone, "basketball-boys")
+            print(f"Basketball boys scrape completed for {timezone}: {result}")
+        except Exception as e:
+            print(f"Error scraping basketball boys for {timezone}: {e}")
+
+
+# Run basketball boys finalization task for all timezones
+async def run_basketball_boys_finalize_all_task(args):
+    """Execute basketball boys finalization for all timezones"""
+    timezones = get_available_timezones()
+    for timezone in timezones:
+        try:
+            result = await manual_timezone_finalize(timezone, "basketball-boys")
+            print(f"Basketball boys finalize completed for {timezone}: {result}")
+        except Exception as e:
+            print(f"Error finalizing basketball boys for {timezone}: {e}")
+
+
+# Run basketball girls scraping task for all timezones
+async def run_basketball_girls_scrape_all_task(args):
+    """Execute basketball girls scraping for all timezones"""
+    timezones = get_available_timezones()
+    for timezone in timezones:
+        try:
+            result = await manual_timezone_scrape(timezone, "basketball-girls")
+            print(f"Basketball girls scrape completed for {timezone}: {result}")
+        except Exception as e:
+            print(f"Error scraping basketball girls for {timezone}: {e}")
+
+
+# Run basketball girls finalization task for all timezones
+async def run_basketball_girls_finalize_all_task(args):
+    """Execute basketball girls finalization for all timezones"""
+    timezones = get_available_timezones()
+    for timezone in timezones:
+        try:
+            result = await manual_timezone_finalize(timezone, "basketball-girls")
+            print(f"Basketball girls finalize completed for {timezone}: {result}")
+        except Exception as e:
+            print(f"Error finalizing basketball girls for {timezone}: {e}")
 
 
 # Main CLI entry point
@@ -140,19 +212,37 @@ def main():
     # Timezone scrape command
     timezone_scrape_parser = subparsers.add_parser("timezone-scrape", help="Run timezone-specific scraping")
     timezone_scrape_parser.add_argument("timezone", choices=get_available_timezones(), help="Timezone to scrape")
-    timezone_scrape_parser.add_argument("--sport", default="football", choices=["football", "volleyball"], help="Sport to scrape (default: football)")
-    
+    timezone_scrape_parser.add_argument("--sport", default="football", choices=["football", "volleyball-girls", "volleyball-boys", "basketball-boys", "basketball-girls"], help="Sport to scrape (default: football)")
+
     # Timezone finalize command
     timezone_finalize_parser = subparsers.add_parser("timezone-finalize", help="Run timezone-specific finalization")
     timezone_finalize_parser.add_argument("timezone", choices=get_available_timezones(), help="Timezone to finalize")
-    timezone_finalize_parser.add_argument("--sport", default="football", choices=["football", "volleyball"], help="Sport to finalize (default: football)")
+    timezone_finalize_parser.add_argument("--sport", default="football", choices=["football", "volleyball-girls", "volleyball-boys", "basketball-boys", "basketball-girls"], help="Sport to finalize (default: football)")
     
-    # Volleyball scrape all timezones command
-    volleyball_scrape_all_parser = subparsers.add_parser("volleyball-scrape-all", help="Run volleyball scraping for all timezones")
-    
-    # Volleyball finalize all timezones command
-    volleyball_finalize_all_parser = subparsers.add_parser("volleyball-finalize-all", help="Run volleyball finalization for all timezones")
-    
+    # Volleyball girls scrape all timezones command
+    volleyball_girls_scrape_all_parser = subparsers.add_parser("volleyball-girls-scrape-all", help="Run volleyball girls scraping for all timezones")
+
+    # Volleyball girls finalize all timezones command
+    volleyball_girls_finalize_all_parser = subparsers.add_parser("volleyball-girls-finalize-all", help="Run volleyball girls finalization for all timezones")
+
+    # Volleyball boys scrape all timezones command
+    volleyball_boys_scrape_all_parser = subparsers.add_parser("volleyball-boys-scrape-all", help="Run volleyball boys scraping for all timezones")
+
+    # Volleyball boys finalize all timezones command
+    volleyball_boys_finalize_all_parser = subparsers.add_parser("volleyball-boys-finalize-all", help="Run volleyball boys finalization for all timezones")
+
+    # Basketball boys scrape all timezones command
+    basketball_boys_scrape_all_parser = subparsers.add_parser("basketball-boys-scrape-all", help="Run basketball boys scraping for all timezones")
+
+    # Basketball boys finalize all timezones command
+    basketball_boys_finalize_all_parser = subparsers.add_parser("basketball-boys-finalize-all", help="Run basketball boys finalization for all timezones")
+
+    # Basketball girls scrape all timezones command
+    basketball_girls_scrape_all_parser = subparsers.add_parser("basketball-girls-scrape-all", help="Run basketball girls scraping for all timezones")
+
+    # Basketball girls finalize all timezones command
+    basketball_girls_finalize_all_parser = subparsers.add_parser("basketball-girls-finalize-all", help="Run basketball girls finalization for all timezones")
+
     args = parser.parse_args()
     
     if not args.command:
@@ -176,10 +266,22 @@ def main():
         asyncio.run(run_timezone_scrape_task(args))
     elif args.command == "timezone-finalize":
         asyncio.run(run_timezone_finalize_task(args))
-    elif args.command == "volleyball-scrape-all":
-        asyncio.run(run_volleyball_scrape_all_task(args))
-    elif args.command == "volleyball-finalize-all":
-        asyncio.run(run_volleyball_finalize_all_task(args))
+    elif args.command == "volleyball-girls-scrape-all":
+        asyncio.run(run_volleyball_girls_scrape_all_task(args))
+    elif args.command == "volleyball-girls-finalize-all":
+        asyncio.run(run_volleyball_girls_finalize_all_task(args))
+    elif args.command == "volleyball-boys-scrape-all":
+        asyncio.run(run_volleyball_boys_scrape_all_task(args))
+    elif args.command == "volleyball-boys-finalize-all":
+        asyncio.run(run_volleyball_boys_finalize_all_task(args))
+    elif args.command == "basketball-boys-scrape-all":
+        asyncio.run(run_basketball_boys_scrape_all_task(args))
+    elif args.command == "basketball-boys-finalize-all":
+        asyncio.run(run_basketball_boys_finalize_all_task(args))
+    elif args.command == "basketball-girls-scrape-all":
+        asyncio.run(run_basketball_girls_scrape_all_task(args))
+    elif args.command == "basketball-girls-finalize-all":
+        asyncio.run(run_basketball_girls_finalize_all_task(args))
 
 
 if __name__ == "__main__":
