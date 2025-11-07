@@ -6,7 +6,7 @@ import pytz
 # Seasonal sports configuration based on typical US high school sports seasons
 SEASONAL_SPORTS = {
     "fall": {
-        "months": [8, 9, 10, 11],  # August - November
+        "months": [8, 9, 10],  # August - October
         "sports": ["football", "volleyball-girls", "volleyball-boys"],
         "description": "Fall season - Football and Volleyball (Boys & Girls)"
     },
